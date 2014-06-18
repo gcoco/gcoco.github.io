@@ -1,0 +1,99 @@
+<html>
+<body>
+<h1>Open Build Server notes</h1>
+<pre>
+Install Appliance from ISO into VBox
+
+Login to the server: root/opensuse
+
+Edit /etc/sysconfig/network/ifcfg-eth0
+Change: BOOTPROTO='static'
+Add: IPADDR='<ip_addr>/<mask>'
+
+Edit /etc/sysconfig/network/routes
+Add: default <gw_ip> - -
+
+Edit: /etc/resolv.conf
+Add: nameserver <dns_ip>
+     nameserver <dns_ip>
+
+Once installed, modify /etc/HOSTNAME and enter new hostname
+obsserver
+
+Edit /etc/hosts
+Add: <ip_addr> obsserver
+
+Restart networking: service network restart
+
+Turn on SSHD at boot:
+chkconfig sshd on
+
+Start SSHD service:
+service sshd start
+
+Change root passwd:
+passwd
+
+Test ssh login as root (I know this is bad but inside my network access only)
+
+If successful, reboot the server.
+
+Add hostname to your internal DNS or modify the hosts file on the computer that has the web client on it.
+
+Login to the servers web interface: http://hostname
+Admin/opensuse
+
+Click Configuration icon.
+Click Interconnect link.
+Click Save changes button.
+
+Repo setup. Example: Fedora:19 from build.opensuse.org
+
+As Admin, make a project of the repo you want to build with via the web interface.
+Then from the shell, run
+
+  export PROJECT="Fedora:19"
+  export ARCH=i586 or export ARCH=x86_64
+  osc -A https://api.opensuse.org/public meta prjconf $PROJECT > project.conf
+  
+Enter you username/password for the OpenSuse site.
+
+  osc -A https://obsserver:444 meta prjconf -F project.conf $PROJECT
+  
+Enter the local buildserver Admin username/password.
+
+Stop the scheduler:
+
+  rcobsscheduler stop
+
+Now mirror the repo (need to fnd a better way to do this.)
+
+ obs_mirror_project $PROJECT standard $ARCH
+
+Change permissions on files
+
+chmod -R obsrun:obsrun /srv/obs/build/$PROJECT
+
+Now rescan the repo
+
+ /usr/lib/obs/server/bs_admin --rescan-repository $PROJECT standard $ARCH
+ 
+Once finished start the scheduler
+
+  rcobsscheduler start
+
+
+In theory you should be able to build against the PROJECT and ARCH you setup.
+
+*Debian Packaging Guidelines for OBS
+
+1.0 or 3.0 (native): package_version.tar.gz
+1.0 (non-native):
+    - pkg_ver.orig.tar.gz
+    - pkg_debver.diff.gz
+3.0 (quilt):
+    - pkg_ver.orig.tar.gz: upstream source
+    - pkg_debver.debian.tar.gz:
+</pre>
+</body>
+</html>
