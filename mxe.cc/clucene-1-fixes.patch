@@ -1,0 +1,142 @@
+This file is part of MXE.
+See index.html for further information.
+
+diff -up clucene-core-2.3.3.4/src/core/libclucene-core.pc.cmake.pkgconfig_sys_includes clucene-core-2.3.3.4/src/core/libclucene-core.pc.cmake
+--- clucene-core-2.3.3.4/src/core/libclucene-core.pc.cmake.pkgconfig_sys_includes       2011-03-16 19:21:07.000000000 -0500
++++ clucene-core-2.3.3.4/src/core/libclucene-core.pc.cmake      2012-03-19 09:01:00.689263954 -0500
+@@ -6,6 +6,6 @@ includedir=${prefix}/include:${prefix}/i
+ Name: libclucene
+ Description: CLucene - a C++ search engine, ported from the popular Apache Lucene
+ Version: @CLUCENE_VERSION_MAJOR@.@CLUCENE_VERSION_MINOR@.@CLUCENE_VERSION_REVISION@.@CLUCENE_VERSION_PATCH@
+-Libs: -L${prefix}/@LIB_DESTINATION@/ -lclucene-core
+-Cflags: -I${prefix}/include -I${prefix}/include/CLucene/ext
++Libs: -L${prefix}/@LIB_DESTINATION@/ -lclucene-core -lclucene-shared
++Cflags: -I${prefix}/include -I${prefix}/include/CLucene/ext -I@LUCENE_SYS_INCLUDES@
+ ~
+
+diff -NaurpBb clucene-core-2.3.3.4/CMakeLists.txt clucene-core-2.3.3.4-mod/CMakeLists.txt
+--- clucene-core-2.3.3.4/CMakeLists.txt 2011-03-17 03:21:07.000000000 +0300
++++ clucene-core-2.3.3.4-mod/CMakeLists.txt     2011-08-16 16:56:55.968268152 +0400
+@@ -163,7 +163,7 @@ IF ( BUILD_CONTRIBS )
+   SET(BUILD_CONTRIBS_LIB 1)
+ ENDIF ( BUILD_CONTRIBS )
+ IF ( BUILD_CONTRIBS_LIB )
+-  ADD_SUBDIRECTORY (src/contribs-lib EXCLUDE_FROM_ALL)
++  ADD_SUBDIRECTORY (src/contribs-lib)
+ ENDIF ( BUILD_CONTRIBS_LIB )
+
+
+diff -NaurpBb clucene-core-2.3.3.4/src/contribs-lib/CMakeLists.txt clucene-core-2.3.3.4-mod/src/contribs-lib/CMakeLists.txt
+--- clucene-core-2.3.3.4/src/contribs-lib/CMakeLists.txt        2011-03-17 03:21:07.000000000 +0300
++++ clucene-core-2.3.3.4-mod/src/contribs-lib/CMakeLists.txt    2011-08-16 17:14:13.499275499 +0400
+@@ -106,9 +106,26 @@ add_library(clucene-contribs-lib SHARED
+ )
+ TARGET_LINK_LIBRARIES(clucene-contribs-lib ${clucene_contrib_extra_libs})
+
++#install public headers.
++FOREACH(file ${HEADERS})
++       get_filename_component(apath ${file} PATH)
++       get_filename_component(aname ${file} NAME)
++       file(RELATIVE_PATH relpath ${CMAKE_SOURCE_DIR}/src/contribs-lib ${apath})
++       IF ( NOT aname MATCHES "^_.*" )
++               install(FILES ${file}
++                       DESTINATION include/${relpath}
++                       COMPONENT development)
++       ENDIF ( NOT aname MATCHES "^_.*" )
++ENDFOREACH(file)
++
+ #set properties on the libraries
+ SET_TARGET_PROPERTIES(clucene-contribs-lib PROPERTIES
+     VERSION ${CLUCENE_VERSION}
+     SOVERSION ${CLUCENE_SOVERSION}
+     COMPILE_DEFINITIONS_DEBUG _DEBUG
+ )
++
++#and install library
++install(TARGETS clucene-contribs-lib
++        DESTINATION ${LIB_DESTINATION}
++        COMPONENT runtime )
+
+
+Added a little patch to fix up some compile problems related to threads
+on Win64 targets.
+--- a/src/shared/CLucene/LuceneThreads.h
++++ b/src/shared/CLucene/LuceneThreads.h
+@@ -30,6 +30,9 @@
+   #define _LUCENE_ATOMIC_INC(theInteger) (++(*theInteger))
+   #define _LUCENE_ATOMIC_DEC(theInteger) (--(*theInteger))
+   #define _LUCENE_ATOMIC_INT int
++
++       #define _LUCENE_ATOMIC_INT_SET(x, v) x=v
++       #define _LUCENE_ATOMIC_INT_GET(x) x
+ #else
+        #if defined(_LUCENE_DONTIMPLEMENT_THREADMUTEX)
+                //do nothing
+--- a/src/core/CLucene/store/FSDirectory.cpp
++++ b/src/core/CLucene/store/FSDirectory.cpp
+@@ -582,7 +582,9 @@
+   void FSDirectory::close(){
+     SCOPED_LOCK_MUTEX(DIRECTORIES_LOCK)
+     {
++#if !defined(_CL_DISABLE_MULTITHREADING)
+            THIS_LOCK.lock();
++#endif
+
+            CND_PRECONDITION(directory[0]!=0,"directory is not open");
+
+@@ -595,7 +597,9 @@
+                    return;
+                }
+            }
++#if !defined(_CL_DISABLE_MULTITHREADING)
+            THIS_LOCK.unlock();
++#endif
+          }
+    }
+
+--- a/src/shared/CLucene/util/Misc.cpp
++++ b/src/shared/CLucene/util/Misc.cpp
+@@ -474,6 +474,7 @@
+   }
+   return toString(ids[value]);
+ }
++#if !defined(_CL_DISABLE_MULTITHREADING)
+ std::string Misc::toString(const int32_t value){
+   char buf[20];
+   TCHAR tbuf[20];
+@@ -481,6 +482,7 @@
+   STRCPY_TtoA(buf,tbuf,20);
+   return buf;
+ }
++#endif
+ std::string Misc::toString(const int64_t value){
+   char buf[20];
+   TCHAR tbuf[20];
+--- a/src/shared/CLucene/util/Misc.h
++++ b/src/shared/CLucene/util/Misc.h
+@@ -67,7 +67,9 @@
+
+   static std::string toString(const int32_t value);
+   static std::string toString(const int64_t value);
++#if !defined(_CL_DISABLE_MULTITHREADING)
+   static std::string toString(const _LUCENE_THREADID_TYPE value);
++#endif
+   static std::string toString(const bool value);
+   static std::string toString(const float_t value);
+   static std::string toString(const TCHAR* s, int32_t len=-1);
+
+
+--- a/src/shared/CMakeLists.txt.orig    2013-05-31 17:11:01.425990943 +0200
++++ b/src/shared/CMakeLists.txt 2013-05-31 17:11:38.683672231 +0200
+@@ -214,9 +214,9 @@
+ IF ( CMAKE_USE_WIN32_THREADS_INIT )
+     SET ( _CL_HAVE_WIN32_THREADS 1 )
+ ENDIF ( CMAKE_USE_WIN32_THREADS_INIT )
+-IF ( CMAKE_USE_PTHREADS_INIT )
++IF ( CMAKE_USE_PTHREADS_INIT AND NOT _CL_HAVE_WIN32_THREADS)
+     SET ( _CL_HAVE_PTHREAD 1 )
+-ENDIF (CMAKE_USE_PTHREADS_INIT)
++ENDIF (CMAKE_USE_PTHREADS_INIT AND NOT _CL_HAVE_WIN32_THREADS)
+ IF ( CMAKE_USE_SPROC_INIT OR CMAKE_HP_PTHREADS_INIT )
+     MESSAGE(FATAL_ERROR "Threads library not implemented")
+ ENDIF( CMAKE_USE_SPROC_INIT OR CMAKE_HP_PTHREADS_INIT )
