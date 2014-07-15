@@ -1,10 +1,13 @@
 <html>
 <head>Build using mxe.cc</head>
+
 <body>
 
-From home directory:
+From the user home home directory:
 
 <pre>mkdir GC-build && cd GC-build</pre>
+
+Install the requirements for mxe.cc listed <a href="http://mxe.cc/#requirements">here</a>.
 
 Then clone in mxe.cc
 
@@ -20,7 +23,7 @@ Edit the file: src/qt.mk and change at the end of the file:
 to 
 <pre>$(PKG)_BUILD_STATIC = $(subst -static ,-shared ,\</pre>
 
-Copy clucene.mk and clucene-1-fixes.patch into mxe/src
+Copy <a href="clucene.mk">clucene.mk</a> and <a href="clucene-1-fixes.patch">clucene-1-fixes.patch</a> into src
 
 Export the desired build environment
 
@@ -39,6 +42,7 @@ Clone in Golden Cheetah
 <pre>git clone https://github.com/GoldenCheetah/GoldenCheetah.git GoldenCheetah-32bit</pre>
 
 Create a build script: 32-build.sh with the following content.
+Uncomment any lines that you have extra info for (will add srmio/vlc/usb stuff later)
 
 <pre>
 #!/bin/bash
@@ -135,3 +139,6 @@ sqldrivers/qsqlite4.dll   * Need to keep this path structure
 </pre>
 
 In theory you chould be able to run GC now on your Windows machine.
+
+</body>
+</html>
