@@ -2,10 +2,48 @@
 <head>Build using mxe.cc</head>
 <body>
 
+From home directory:
+
+<pre>mkdir GC-build && cd GC-build</pre>
+
+Then clone in mxe.cc
+
+<pre>git clone --depth=1 https://github.com/mxe/mxe.git mxe</pre>
+
+Change into the mxe directory
+
+<pre>cd mxe</pre>
+
+Edit the file: src/qt.mk and change at the end of the file:
+
+<pre>$(PKG)_BUILD_SHARED = $(subst -static ,-shared ,\</pre>
+to 
+<pre>$(PKG)_BUILD_STATIC = $(subst -static ,-shared ,\</pre>
+
+Copy clucene.mk and clucene-1-fixes.patch into mxe/src
+
+Export the desired build environment
+
+<pre>export MXE_TARGETS='i686-w64-mingw32.static'</pre>
+
+Now build the cross compiler (this takes a while)
+
+<pre>make qt libical liboauth qwtplot3d clucene</pre>
+
+Now go back to the build root
+
+<pre>cd ..</pre>
+
+Clone in Golden Cheetah
+
+<pre>git clone https://github.com/GoldenCheetah/GoldenCheetah.git GoldenCheetah-32bit</pre>
+
+Create a build script: 32-build.sh with the following content.
+
 <pre>
 #!/bin/bash
-PATH=$HOME/GC-build/mxe/usr/bin:$PATH
-cd $HOME/GC-build/GoldenCheetah-32bit
+PATH=${HOME}/GC-build/mxe/usr/bin:${PATH}
+cd ${HOME}/GC-build/GoldenCheetah-32bit
 git am --abort
 git checkout master
 git reset --hard HEAD~5
@@ -14,10 +52,42 @@ C_BRANCH=`git branch | egrep "^*" | cut -c3-20`
 C_VER=`git rev-parse HEAD | cut -c 1-10`
 C_DATE=`git log -1 --date=iso --format=fuller | egrep ^CommitDate | cut -c 13-22`
 C_INFO=${C_DATE}':'${C_BRANCH}'@'${C_VER}
-git am ../0001-src-main.cpp-set-appliation-organization-names.patch
-sed <./src/gcconfig.pri.orig >./src/gcconfig.pri -e "s|COMMIT_INFO|${C_INFO}|"
-make sub-src-distclean
-/usr/bin/lupdate-qt4 $HOME/GC-build/GoldenCheetah/src/src.pro
+cat > src/gcconfig.pri << EOF
+MXE=${HOME}/GC-build/mxe/usr/i686-w64-mingw32.static
+DEFINES += GC_VERSION=\\\\\"${C_INFO}\\\\\"
+#DEFINES += GC_STRAVA_CLIENT_SECRET=\\\\\"  secret here  \\\\\"
+#DEFINES += GC_CYCLINGANALYTICS_CLIENT_SECRET=\\\\\"  secret here  \\\\\"
+CONFIG += release
+CONFIG += console
+QMAKE_LFLAGS = -mwindows
+QMAKE_LRELEASE = /usr/bin/lrelease-qt4
+QMAKE_LEX  = flex
+QMAKE_YACC = bison --file-prefix=y -t
+QMAKE_DEL_FILE = rm -f
+#SRMIO_INSTALL = ../../srmio-win32
+#D2XX_INCLUDE = ../../D2XX_v2.10.00
+#D2XX_LIBS    = ../../D2XX_v2.10.00/i386/ftd2xx.lib
+LIBOAUTH_INSTALL = \$\${MXE}
+LIBOAUTH_LIBS    = -loauth
+QWT3D_INSTALL = \$\${MXE}
+QWT3D_INCLUDE = \$\${MXE}/include/qwtplot3d
+QWT3D_LIBS    =  -lqwtplot3d -lopengl32 -lglu32
+ICAL_INSTALL = \$\${MXE}
+ICAL_LIBS    = -lical -licalss -licalvcal
+#USBXPRESS_INSTALL = ../../USBXpress-win32
+#LIBUSB_INSTALL = ../../libusb-win32-bin-1.2.6.0
+#VLC_INSTALL = ../../vlc-2.0.8-32bit/sdk
+#VLC_LIBS    = ../../vlc-2.0.8-32bit/sdk/lib/libvlc.lib   ../../vlc-2.0.8-32bit/sdk/lib/libvlccore.lib
+CLUCENE_INCLUDE = \$\${MXE}/include/CLucene
+CLUCENE_LIBS = \$\${MXE}/lib/libclucene-core.dll.a  \$\${MXE}/lib//libclucene-shared.dll.a
+CONFIG   += link_pkgconfig
+PKGCONFIG = oauth libical oauth
+LIBZ_LIBS    = -lz
+DEFINES += GC_WANT_ROBOT
+DEFINES += GC_VIDEO_VLC
+EOF
+make distclean
+#/usr/bin/lupdate-qt4 ${HOME}/GC-build/GoldenCheetah/src/src.pro
 i686-w64-mingw32.static-qmake-qt4 -recursive
 make qmake_all
 time make sub-qwt -j 8 -l 10
@@ -25,9 +95,43 @@ cd src
 make -f Makefile.Release JsonRideFile_lex.cpp JsonRideFile_yacc.cpp
 make -f Makefile.Release WithingsParser_lex.cpp WithingsParser_yacc.cpp
 cd ..
-time make sub-src -j 8 -l 10 || make sub-src
-cp src/release/GoldenCheetah.exe $HOME/Dropbox/Cycling/GC-32bit/
+time make sub-src -j 8 -l 10
 git am --abort
 git checkout master
 git reset --hard ${C_VER}
 </pre>
+
+If this all worked then you should have in ~/GC-build/GoldenCheetah-32bit/src/release the file:
+
+<pre>GoldenCheetah.exe</pre>
+
+You need to copy this file and the following files to a Windows machine:
+
+From the /GC-build/GoldenCheetah-32bit/src/images
+
+<pre>gc.ico</pre>
+
+From the ~/GC-build/mxe/usr/i686-w64-mingw32.static/bin
+
+<pre>
+libclucene-core.dll
+libclucene-shared.dll
+</pre>
+
+From the ~/GC-build/mxe/usr/i686-w64-mingw32.static/qt/bin
+
+<pre>
+QtCore4.dll
+QtGui4.dll
+QtNetwork4.dll
+QtOpenGL4.dll
+QtScript4.dll
+QtSql4.dll
+QtSvg4.dll
+QtWebKit4.dll
+QtXml4.dll
+imageformats/qjpeg4.dll   * Need to keep this path structure
+sqldrivers/qsqlite4.dll   * Need to keep this path structure
+</pre>
+
+In theory you chould be able to run GC now on your Windows machine.
