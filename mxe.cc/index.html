@@ -4,7 +4,7 @@
 
 <pre>
 #!/bin/bash
-export PATH=$HOME/GC-build/mxe/usr/bin:$PATH
+PATH=$HOME/GC-build/mxe/usr/bin:$PATH
 cd $HOME/GC-build/GoldenCheetah-32bit
 git am --abort
 git checkout master
@@ -15,7 +15,6 @@ C_VER=`git rev-parse HEAD | cut -c 1-10`
 C_DATE=`git log -1 --date=iso --format=fuller | egrep ^CommitDate | cut -c 13-22`
 C_INFO=${C_DATE}':'${C_BRANCH}'@'${C_VER}
 git am ../0001-src-main.cpp-set-appliation-organization-names.patch
-git am ../0001-Enable-debug.patch
 sed <./src/gcconfig.pri.orig >./src/gcconfig.pri -e "s|COMMIT_INFO|${C_INFO}|"
 make sub-src-distclean
 /usr/bin/lupdate-qt4 $HOME/GC-build/GoldenCheetah/src/src.pro
