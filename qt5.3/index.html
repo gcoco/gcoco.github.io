@@ -24,34 +24,35 @@ Extract into a directory. You do not need to install the drivers.
 Download and extract D2XX drivers from: http://www.ftdichip.com/Drivers/D2XX.htm
 <p>
 I downloaded: CDM v2.10.00 (http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip)
-
+<p>
 You will need flex. Get a copy from: http://gnuwin32.sourceforge.net/packages/flex.htm
-
+<p>
 I used the Binaries zip. (http://gnuwin32.sourceforge.net/downlinks/flex-bin-zip.php)
-
+<p>
 Open the zip file, go into the bin folder and extract all files into the Qt bin folder.
-
+<p>
 You will need bison. Get a copy from: http://gnuwin32.sourceforge.net/packages/bison.htm
-
+<p>
 I used the Binaries zip. (http://downloads.sourceforge.net/gnuwin32/bison-2.4.1-bin.zip)
-
+<p>
 Open the zip file, go into the bin folder and extract all files into the Qt bin folder.
-
+<p>
 Get a copy of the GC master code. (https://github.com/GoldenCheetah/GoldenCheetah/archive/master.zip)
-
+<p>
 Extract the files.
-
+<p>
 In qwt folder, copy qwtconfig.pri.in to qwtconfig.pri
 In src folder, copy gcconfig.pri.in to gcconfig.pri
-    
+<p>
+<code>
 CONFIG += release
 QMAKE_LEX = flex
 QMAKE_YACC = bison --file-prefix=y -t
 D2XX_INCLUDE = ../../D2XX
 USB_XPRESS_INSTALL = ../../SiLabs/Host/
 LIBUSB_INSTALL = ../../libusb-win32-bin-1.2.6.0
+</code>
+<p>
 
-
-</pre>
 </body>
 </html>
