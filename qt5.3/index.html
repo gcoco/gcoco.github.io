@@ -42,7 +42,10 @@ Get a copy of the GC master code. (https://github.com/GoldenCheetah/GoldenCheeta
 Extract the files.
 <p>
 In qwt folder, copy qwtconfig.pri.in to qwtconfig.pri
+<p></p>
 In src folder, copy gcconfig.pri.in to gcconfig.pri
+<p>
+Edit gcconfig.pri and uncomment and set lines as follows
 <p>
 <pre>
 CONFIG += release
@@ -52,7 +55,11 @@ D2XX_INCLUDE = ../../D2XX
 USB_XPRESS_INSTALL = ../../SiLabs/Host/
 LIBUSB_INSTALL = ../../libusb-win32-bin-1.2.6.0
 </pre>
+In main GoldenCheetah folder run:
 <p>
-
+<code>qmake -recursive</code><br>
+<code>mingw32-make</code>
+<p>
+Go for a ride.
 </body>
 </html>
