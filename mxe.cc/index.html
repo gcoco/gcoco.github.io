@@ -35,7 +35,8 @@ Copy <a href="clucene.mk">clucene.mk</a> and <a href="clucene-1-fixes.patch">clu
 
 Export the desired build environment
 
-<pre>export MXE_TARGETS='i686-w64-mingw32.static'</pre>
+For a 32bit build: <pre>export MXE_TARGETS='i686-w64-mingw32.static'</pre>
+For a 64bit build: <pre>export MXE_TARGETS='x86_64-w64-mingw32.static'</pre>
 
 Now build the cross compiler (this takes a while)
 
@@ -47,7 +48,7 @@ Now go back to the build root
 
 <p>Download and extract libusb-win32 from: <a href="http://sourceforge.net/projects/libusb-win32/">http://sourceforge.net/projects/libusb-win32/</a></p>
 
-<p>I downloaded: libusb-win32-bin-1.2.6.0.zip (<a href="http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download">http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download</a>)</p>
+<p>I downloaded: libusb-win32-bin-1.2.6.0.zip (<a href="http://sourceforge.net/projects/libusb-win32/files/latest/download?source=files">http://sourceforge.net/projects/libusb-win32/files/latest/download?source=files</a>)</p>
 
 Unzip the file while in the build root drectory.
 
@@ -55,7 +56,7 @@ Unzip the file while in the build root drectory.
 
 As we may upgrade libusb-win32 at a later stage, let's create a symlink for the moment.
 
-<pre>ln -s libusb-win32-bin-1.2.6.0.zip libusb-win32</pre>
+<pre>ln -s libusb-win32-bin-1.2.6.0.zip libusb-win</pre>
 
 In the include directory, copy lusb0_usb.h to usb.h
 
@@ -100,7 +101,10 @@ C_VER=`git rev-parse HEAD | cut -c 1-10`
 C_DATE=`git log -1 --date=iso --format=fuller | egrep ^CommitDate | cut -c 13-22`
 C_INFO=${C_DATE}':'${C_BRANCH}'@'${C_VER}
 cat > src/gcconfig.pri << EOF
-MXE=${HOME}/GC-build/mxe/usr/i686-w64-mingw32.static
+# Uncomment the next line for a 32bit build
+#MXE=${HOME}/GC-build/mxe/usr/i686-w64-mingw32.static
+# Uncomment the next line for a 64bit build
+#MXE=${HOME}/GC-build/mxe/usr/x86_64-w64-mingw32.static
 DEFINES += GC_VERSION=\\\\\"${C_INFO}\\\\\"
 #DEFINES += GC_STRAVA_CLIENT_SECRET=\\\\\"<secret here>\\\\\"
 #DEFINES += GC_CYCLINGANALYTICS_CLIENT_SECRET=\\\\\"<secret here>\\\\\"
@@ -113,7 +117,10 @@ QMAKE_YACC = bison --file-prefix=y -t
 QMAKE_DEL_FILE = rm -f
 #SRMIO_INSTALL = ../../srmio-win32
 D2XX_INCLUDE = ../../D2XX
-D2XX_LIBS    = ../../D2XX/i386/ftd2xx.lib
+# Uncomment the next line for a 32bit build
+#D2XX_LIBS    = ../../D2XX/i386/ftd2xx.lib
+# Uncomment the next line for a 64bit build
+#D2XX_LIBS    = ../../D2XX/amd64/ftd2xx.lib
 LIBOAUTH_INSTALL = \$\${MXE}
 LIBOAUTH_LIBS    = -loauth
 QWT3D_INSTALL = \$\${MXE}
@@ -122,9 +129,13 @@ QWT3D_LIBS    =  -lqwtplot3d -lopengl32 -lglu32
 ICAL_INSTALL = \$\${MXE}
 ICAL_LIBS    = -lical -licalss -licalvcal
 #USBXPRESS_INSTALL = ../../USBXpress-win32
-#LIBUSB_INSTALL = ../../libusb-win32-bin-1.2.6.0
+#LIBUSB_INSTALL = ../../libusb-win32
+# Uncomment the next two lines for a 32bit build
 #VLC_INSTALL = ../../vlc-win32/sdk
 #VLC_LIBS    = ../../vlc-win32/sdk/lib/libvlc.lib   ../../vlc-win32/sdk/lib/libvlccore.lib
+# Uncomment the next two lines for a 64bit build
+#VLC_INSTALL = ../../vlc-win64/sdk
+#VLC_LIBS    = ../../vlc-win64/sdk/lib/libvlc.lib   ../../vlc-win32/sdk/lib/libvlccore.lib
 CLUCENE_INCLUDE = \$\${MXE}/include/CLucene
 CLUCENE_LIBS = \$\${MXE}/lib/libclucene-core.dll.a  \$\${MXE}/lib//libclucene-shared.dll.a
 CONFIG   += link_pkgconfig
@@ -147,24 +158,18 @@ git checkout master
 git reset --hard ${C_VER}
 </pre>
 
-If this all worked then you should have in $GC_ROOT/GoldenCheetah-32bit/src/release the file:
+If this all worked then you should have in $GC_ROOT/GoldenCheetah/src/release the file:
 
 <pre>GoldenCheetah.exe</pre>
 
 You need to copy this file and the following files to a Windows machine:
 
-From the $GC_ROOT/GoldenCheetah-32bit/src/images
+From the $GC_ROOT/GoldenCheetah/src/images
 
 <pre>gc.ico</pre>
 
-From the $GC_ROOT/mxe/usr/i686-w64-mingw32.static/bin
-
-<pre>
-libclucene-core.dll
-libclucene-shared.dll
-</pre>
-
-From the $GC_ROOT/mxe/usr/i686-w64-mingw32.static/qt/bin
+For a 32bit build, download from $GC_ROOT/mxe/usr/i686-w64-mingw32.static/qt/bin<br>
+For a 64bit build, download from $GC_ROOT/mxe/usr/x86_64-w64-mingw32.static/qt/bin<br>
 
 <pre>
 QtCore4.dll
@@ -178,6 +183,38 @@ QtWebKit4.dll
 QtXml4.dll
 imageformats/qjpeg4.dll   * Need to keep this path structure
 sqldrivers/qsqlite4.dll   * Need to keep this path structure
+</pre>
+
+For a 32bit build, download from $GC_ROOT/mxe/usr/i686-w64-mingw32.static/bin<br>
+For a 64bit build, download from $GC_ROOT/mxe/usr/x86_64-w64-mingw32.static/bin<br>
+
+<pre>
+libclucene-core.dll
+libclucene-shared.dll
+</pre>
+
+For a 32bit build, download from $GC_ROOT/libusb-win32/bin/x86/
+
+<pre>
+libusb0_x86.dll   * Rename to libusb0.dll
+</pre>
+
+For a 64bit build, download from $GC_ROOT/libusb-win32/bin/amd64/
+
+<pre>
+libusb0.dll
+</pre>
+
+For a 32bit build, downlaod from $GC_ROOT/D2XX/i386
+
+<pre>
+ftd2xx.dll
+</pre>
+
+For a 64bit build, download from $GC_ROOT/D2XX/amd64/
+
+<pre>
+ftd2xx64.dll   * Rename to ftdi2xx.dll
 </pre>
 
 In theory you chould be able to run GC now on your Windows machine.
