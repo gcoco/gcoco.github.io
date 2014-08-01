@@ -1,0 +1,13 @@
+This file is part of MXE.
+See index.html for further information.
+
+--- a/src/oauth_http.c.orig   2014-07-27 13:50:47.762055194 -0400
++++ b/src/oauth_http.c        2014-07-27 13:51:30.090063511 -0400
+@@ -183,6 +183,7 @@
+     xfree(t1);
+     return NULL;
+   }
++  curl_easy_setopt(curl, CURLOPT_SSL_VERIFYPEER, 0);
+   curl_easy_setopt(curl, CURLOPT_URL, q?t1:u);
+   curl_easy_setopt(curl, CURLOPT_WRITEDATA, (void *)&chunk);
+   curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, WriteMemoryCallback);
