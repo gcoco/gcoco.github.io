@@ -43,7 +43,7 @@ Copy <a href="liboauth-1-sslpeerverification.patch">liboauth-1-sslpeerverificati
 
 <pre>wget http://gc.stand2surf.net/mxe.cc/liboauth-1-sslpeerverification.patch -O $GC_ROOT/mxe/src/liboauth-1-sslpeerverification.patch</pre>
 
-Export the desired build environment
+<p>Export the desired build environment.</p>
 
 For a 32bit build: <pre>export MXE_TARGETS='i686-w64-mingw32.static'</pre>
 For a 64bit build: <pre>export MXE_TARGETS='x86_64-w64-mingw32.static'</pre>
@@ -52,29 +52,33 @@ Now build the cross compiler (this takes a while)
 
 <pre>make qt libical liboauth qwtplot3d clucene</pre>
 
-Now go back to the build root
+Now go back to the build root.
 
 <pre>cd $GC_ROOT</pre>
 
 <p>Download and extract libusb-win32 from: <a href="http://sourceforge.net/projects/libusb-win32/">http://sourceforge.net/projects/libusb-win32/</a></p>
 
-<p>I downloaded: libusb-win32-bin-1.2.6.0.zip (<a href="http://sourceforge.net/projects/libusb-win32/files/latest/download?source=files">http://sourceforge.net/projects/libusb-win32/files/latest/download?source=files</a>)</p>
+<p>I downloaded: libusb-win32-bin-1.2.6.0.zip (<a href="http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download">http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download</a>)</p>
+
+<pre>wget http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download -O $GC_ROOT/libusb-win32-bin-1.2.6.0.zip</pre>
 
 Unzip the file while in the build root drectory.
 
-<pre>unzip libusb-win32-bin-1.2.6.0.zip -d $GC_ROOT</pre>
+<pre>unzip $GC_ROOT/libusb-win32-bin-1.2.6.0.zip -d $GC_ROOT</pre>
 
 As we may upgrade libusb-win32 at a later stage, let's create a symlink for the moment.
 
-<pre>ln -s libusb-win32-bin-1.2.6.0.zip libusb-win</pre>
+<pre>ln -s $GC_ROOT/libusb-win32-bin-1.2.6.0 $GC_ROOT/libusb-win</pre>
 
 In the include directory, copy lusb0_usb.h to usb.h
 
-<pre>cd $GC_ROOT/libusb-win32/include && cp lusb0_usb.h usb.h && cd $GC_ROOT</pre>
+<pre>cd $GC_ROOT/libusb-win/include && cp lusb0_usb.h usb.h && cd $GC_ROOT</pre>
 
 <p>Download and install USBXpress Development Kit from: <a href="http://www.silabs.com/products/mcu/Pages/USBXpress.aspx">http://www.silabs.com/products/mcu/Pages/USBXpress.aspx</a></p>
 
 <p>I downloaded the 3.5.1 version. (<a href="http://www.silabs.com/Support%20Documents/Software/USBXpress_Install.exe">http://www.silabs.com/Support%20Documents/Software/USBXpress_Install.exe</a>)</p>
+
+<pre>wget http://www.silabs.com/Support%20Documents/Software/USBXpress_Install.exe -O $GC_ROOT/USBXpress_Install.exe</pre>
 
 Extract into a directory. You do not need to install the drivers.
 
