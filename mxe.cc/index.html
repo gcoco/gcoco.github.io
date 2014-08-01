@@ -32,6 +32,8 @@ Edit the file: $GC_ROOT/mxe/src/qt.mk and change at the end of the file:
 to 
 <pre>$(PKG)_BUILD_STATIC = $(subst -static ,-shared ,\</pre>
 
+<pre>sed -i "s|BUILD_SHARED|BUILD_STATIC|" $GC_ROOT/mxe/src/qt.mk</pre>
+
 Copy <a href="clucene.mk">clucene.mk</a> and <a href="clucene-1-fixes.patch">clucene-1-fixes.patch</a> into $GC_ROOT/mxe/src
 
 <pre>wget http://gc.stand2surf.net/mxe.cc/clucene.mk -O $GC_ROOT/mxe/src/clucene.mk</pre>
