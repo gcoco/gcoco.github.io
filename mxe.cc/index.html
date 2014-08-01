@@ -10,7 +10,7 @@ Create a build root directory somewhere. This example uses the users home direct
 
 Export this as the GC_ROOT variable.
 
-<pre>export GC_ROOT = $HOME/GC-build</pre>
+<pre>export GC_ROOT=$HOME/GC-build</pre>
 
 Change directory to the build root.
 
@@ -33,6 +33,9 @@ to
 <pre>$(PKG)_BUILD_STATIC = $(subst -static ,-shared ,\</pre>
 
 Copy <a href="clucene.mk">clucene.mk</a> and <a href="clucene-1-fixes.patch">clucene-1-fixes.patch</a> into $GC_ROOT/mxe/src
+
+<pre>wget http://gc.stand2surf.net/mxe.cc/clucene.mk -O $GC_ROOT/mxe/src/clucene.mk</pre>
+<pre>wget http://gc.stand2surf.net/mxe.cc/clucene-1-fixes.patch -O $GC_ROOT/mxe/src/clucene-1-fixes.patch</pre>
 
 Export the desired build environment
 
