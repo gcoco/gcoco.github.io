@@ -56,15 +56,19 @@ Now go back to the build root.
 
 <pre>cd $GC_ROOT</pre>
 
+Create a downloads folder to store source files.
+
+<pre>mkdir $GC_ROOT/downloads</pre>
+
 <p>Download and extract libusb-win32 from: <a href="http://sourceforge.net/projects/libusb-win32/">http://sourceforge.net/projects/libusb-win32/</a></p>
 
 <p>I downloaded: libusb-win32-bin-1.2.6.0.zip (<a href="http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download">http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download</a>)</p>
 
-<pre>wget http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download -O $GC_ROOT/libusb-win32-bin-1.2.6.0.zip</pre>
+<pre>wget http://sourceforge.net/projects/libusb-win32/files/libusb-win32-releases/1.2.6.0/libusb-win32-bin-1.2.6.0.zip/download -O $GC_ROOT/downloads/libusb-win32-bin-1.2.6.0.zip</pre>
 
 Unzip the file while in the build root drectory.
 
-<pre>unzip $GC_ROOT/libusb-win32-bin-1.2.6.0.zip -d $GC_ROOT</pre>
+<pre>unzip $GC_ROOT/downloads/libusb-win32-bin-1.2.6.0.zip -d $GC_ROOT</pre>
 
 As we may upgrade libusb-win32 at a later stage, let's create a symlink for the moment.
 
@@ -86,15 +90,15 @@ Extract into a directory. You do not need to install the drivers.
 
 <p>I downloaded: CDM v2.10.00 (<a href="http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip">http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip</a>)</p>
 
-<pre>wget http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip" -O $GC_ROOT/CDM_v2.10.00_WHQL_Certified.zip</pre>
+<pre>wget http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip -O $GC_ROOT/downloads/CDM_v2.10.00_WHQL_Certified.zip</pre>
 
 Unzip the file into the build root drectory.
 
-<pre>unzip $GC_ROOT/CDM_v2.10.00_WHQL_Certified.zip -d $GC_ROOT</pre>
+<pre>unzip $GC_ROOT/downloads/CDM_v2.10.00_WHQL_Certified.zip -d $GC_ROOT/D2XX-CDM_v2.10.00</pre>
 
 As we may upgrade D2XX at a later stage (and I don't like spaces in file names), lets create a symlink for the moment.
 
-<pre>ln -s CDM_ v2.10.00_WHQL_Certified.zip D2XX-win</pre>
+<pre>ln -s D2XX-CDM_v2.10.00 D2XX-win</pre>
 
 Clone in Golden Cheetah
 
@@ -118,7 +122,7 @@ C_DATE=`git log -1 --date=iso --format=fuller | egrep ^CommitDate | cut -c 13-22
 C_INFO=${C_DATE}':'${C_BRANCH}'@'${C_VER}
 cat > src/gcconfig.pri << EOF
 # Uncomment the next line for a 32bit build
-#MXE=${HOME}/GC-build/mxe/usr/i686-w64-mingw32.static
+MXE=${HOME}/GC-build/mxe/usr/i686-w64-mingw32.static
 # Uncomment the next line for a 64bit build
 #MXE=${HOME}/GC-build/mxe/usr/x86_64-w64-mingw32.static
 DEFINES += GC_VERSION=\\\\\"${C_INFO}\\\\\"
@@ -144,8 +148,8 @@ QWT3D_INCLUDE = \$\${MXE}/include/qwtplot3d
 QWT3D_LIBS    =  -lqwtplot3d -lopengl32 -lglu32
 ICAL_INSTALL = \$\${MXE}
 ICAL_LIBS    = -lical -licalss -licalvcal
-#USBXPRESS_INSTALL = ../../USBXpress-win32
-#LIBUSB_INSTALL = ../../libusb-win32
+#USBXPRESS_INSTALL = ../../USBXpress-win
+LIBUSB_INSTALL = ../../libusb-win
 # Uncomment the next two lines for a 32bit build
 #VLC_INSTALL = ../../vlc-win32/sdk
 #VLC_LIBS    = ../../vlc-win32/sdk/lib/libvlc.lib   ../../vlc-win32/sdk/lib/libvlccore.lib
@@ -173,6 +177,10 @@ git am --abort
 git checkout master
 git reset --hard ${C_VER}
 </pre>
+
+Now execute the build script to start compiling Golden Cheetah.
+
+<pre>sh $GC_ROOT/build.sh</pre>
 
 If this all worked then you should have in $GC_ROOT/GoldenCheetah/src/release the file:
 
