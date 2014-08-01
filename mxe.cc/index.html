@@ -86,13 +86,15 @@ Extract into a directory. You do not need to install the drivers.
 
 <p>I downloaded: CDM v2.10.00 (<a href="http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip">http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip</a>)</p>
 
+<pre>wget http://www.ftdichip.com/Drivers/CDM/CDM%20v2.10.00%20WHQL%20Certified.zip" -O $GC_ROOT/CDM_v2.10.00_WHQL_Certified.zip</pre>
+
 Unzip the file into the build root drectory.
 
-<pre>>unzip "CDM v2.10.00 WHQL Certified.zip" -d $GC_ROOT</pre>
+<pre>unzip $GC_ROOT/CDM_v2.10.00_WHQL_Certified.zip -d $GC_ROOT</pre>
 
 As we may upgrade D2XX at a later stage (and I don't like spaces in file names), lets create a symlink for the moment.
 
-<pre>ln -s "CDM v2.10.00 WHQL Certified.zip" D2XX-win32</pre>
+<pre>ln -s CDM_ v2.10.00_WHQL_Certified.zip D2XX-win</pre>
 
 Clone in Golden Cheetah
 
@@ -130,11 +132,11 @@ QMAKE_LEX  = flex
 QMAKE_YACC = bison --file-prefix=y -t
 QMAKE_DEL_FILE = rm -f
 #SRMIO_INSTALL = ../../srmio-win32
-D2XX_INCLUDE = ../../D2XX
+D2XX_INCLUDE = ../../D2XX-win
 # Uncomment the next line for a 32bit build
-#D2XX_LIBS    = ../../D2XX/i386/ftd2xx.lib
+#D2XX_LIBS    = ../../D2XX-win/i386/ftd2xx.lib
 # Uncomment the next line for a 64bit build
-#D2XX_LIBS    = ../../D2XX/amd64/ftd2xx.lib
+#D2XX_LIBS    = ../../D2XX-win/amd64/ftd2xx.lib
 LIBOAUTH_INSTALL = \$\${MXE}
 LIBOAUTH_LIBS    = -loauth
 QWT3D_INSTALL = \$\${MXE}
