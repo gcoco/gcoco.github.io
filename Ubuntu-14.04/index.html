@@ -1,0 +1,64 @@
+<html>
+<head>GoldenCheetah build on Ubuntu 14.04 LTS</head>
+<body>
+<pre>
+3/1/2016 - 14.04-03 LTS (64bit)
+
+# Update apt-cache
+sudo apt-get update
+
+# Update Ubunutu to latest packages
+sudo apt-get upgrade
+
+# Build tools needed
+sudo apt-get install build-essential flex bison git
+
+# Qt5 libs needed
+sudo apt-get install qtbase5-dev qttools5-dev-tools
+sudo apt-get install libqt5svg5-dev qtmultimedia5-dev libqt5serialport5-dev libqt5webkit5-dev qtscript5-dev 
+
+# Needed to build kqoauth
+sudo apt-get install libssl-dev
+
+# Let qtchooser know we are doing Qt5
+export QT_SELECT=5
+
+# Create a dev build dir
+mkdir dev
+cd dev
+
+# Clone GC from GitHub
+git clone https://github.com/GoldenCheetah/GoldenCheetah.git
+
+cd GoldenCheetah
+
+# Copy the default files so we can customize
+cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
+cp src/gcconfig.pri.in src/gcconfig.pri
+
+# Make a release build
+sed -i "s|#\(CONFIG += release.*\)|\1 static|" src/gcconfig.pri
+
+# Use lrelease for translations
+sed -i "s|#\(QMAKE_LRELEASE = \).*|\1 lrelease|" src/gcconfig.pri
+
+# Use subdirs for building
+sed -i "s|^#DESTDIR|DESTDIR|" src/gcconfig.pri
+sed -i "s|^#OBJECTS_DIR|OBJECT_DIR|" src/gcconfig.pri
+sed -i "s|^#MOC_DIR|MOC_DIR|" src/gcconfig.pri
+sed -i "s|^#RCC_DIR|RCC_DIR|" src/gcconfig.pri
+sed -i "s|^#UI_DIR|UI_DIR|" src/gcconfig.pri
+
+# We need -lz so uncomment
+sed -i "s|^#LIBZ_LIBS|LIBZ_LIBS|" src/gcconfig.pri
+
+# Build make files recursively
+qmake -recursive
+
+# Build GC with four concurrent
+make -j4
+
+# Confirm it runs
+src/GoldenCheetah --version
+</body>
+</html>
