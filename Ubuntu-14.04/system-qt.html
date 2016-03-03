@@ -68,7 +68,7 @@ src/GoldenCheetah --version
 
 To run this on a clean machine
 
-sudo apt-get install libqt5serialport5 libqt5concurrent5
+sudo apt-get install libqt5serialport5 libqt5concurrent5 libqt5multimediawidgets5
 ./GoldenCheetah
 
 # Enable libical (Diary feature)
@@ -95,6 +95,31 @@ make -j4
 
 You can run this on the same machine as before without installing any additional libraries
 
+# Enable R integration
+sed -i "s|^#HTPATH|HTPATH|" src/gcconfig.pri
+
+make sub-src-distclean
+qmake -recursive
+make -j4
+
+You can run this on the same machine as before without installing any additional libraries
+
+# Enable vlc video instead of Qt5
+sudo apt-get install libvlc-dev libvlccore-dev
+
+sed -i "s|#\(VLC_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
+sed -i "s|#\(VLC_LIBS    =\).*|\1 -lvlc -lvlccore|" src/gcconfig.pri
+sed -i "s|\(DEFINES += GC_VIDEO_QT5.*\)|#\1 |" src/gcconfig.pri
+sed -i "s|#\(DEFINES += GC_VIDEO_VLC.*\)|\1 |" src/gcconfig.pri
+
+make sub-src-distclean
+qmake -recursive
+make -j4
+
+To run on our machine we now need vlc libs
+sudo apt-get install libvlc5 libvlccore7
+
+./GoldenCheetah
 
 </body>
 </html>
