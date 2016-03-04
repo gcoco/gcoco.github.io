@@ -15,7 +15,7 @@ sudo apt-get install build-essential flex bison git
 
 # Qt5 libs needed
 sudo apt-get install qtbase5-dev qttools5-dev-tools
-sudo apt-get install libqt5svg5-dev qtmultimedia5-dev libqt5serialport5-dev libudev-dev libqt5webkit5-dev qtscript5-dev 
+sudo apt-get install libqt5svg5-dev qtmultimedia5-dev libqt5serialport5-dev libudev-dev libqt5webkit5-dev
 
 # Needed to build kqoauth
 sudo apt-get install libssl-dev
@@ -81,7 +81,7 @@ make sub-src-distclean
 qmake -recursive
 make -j4
 
-You can run this on the same machine as before without installing any additional libraries
+# You can run this on the same machine as before without installing any additional libraries
 
 # Enable libsamplerate
 sudo apt-get install libsamplerate0-dev
@@ -93,7 +93,7 @@ make sub-src-distclean
 qmake -recursive
 make -j4
 
-You can run this on the same machine as before without installing any additional libraries
+# You can run this on the same machine as before without installing any additional libraries
 
 # Enable R integration
 sed -i "s|^#HTPATH|HTPATH|" src/gcconfig.pri
@@ -116,9 +116,30 @@ make sub-src-distclean
 qmake -recursive
 make -j4
 
-To run on our machine we now need vlc libs
-sudo apt-get install libvlc5 libvlccore7
+# To run on our machine we now need vlc
+sudo apt-get install vlc
 
+# Reload the cache so we dont crash due to file: libqt4_plugin.so
+sudo /usr/lib/vlc/vlc-cache-gen -f /usr/lib/vlc/plugins
+
+./GoldenCheetah
+
+# Add qwtplot3d support
+cd ~/dev
+git clone https://github.com/sintegrial/qwtplot3d.git qwtplot3d
+cd qwtplot3d
+# we don't need the examples
+sed -i "s|examples||" qwtplot3d.pro
+qmake
+make
+cd ~/dev/GoldenCheetah
+sed -i "s|#\(QWT3D_INSTALL =.*\)|\1 ../../qwtplot3d|" src/gcconfig.pri
+
+make sub-src-distclean
+qmake -recursive
+make -j4
+
+# You can run this on the same machine as before without installing any additional libraries
 ./GoldenCheetah
 
 </body>
