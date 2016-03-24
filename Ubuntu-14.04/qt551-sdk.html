@@ -8,9 +8,6 @@ sudo apt-get update
 # Update Ubunutu to latest packages
 sudo apt-get upgrade
 
-# Download Qt 5.5.1 SDK
-wget http://download.qt.io/official_releases/qt/5.5/5.5.1/qt-opensource-linux-x64-5.5.1.run
-
 # Build tools needed
 sudo apt-get install build-essential flex bison git
 
@@ -25,8 +22,13 @@ sudo apt-get install libssl-dev
 export QT_SELECT=5
 
 # Create a dev build dir
-mkdir dev
-cd dev
+mkdir ~/dev
+cd ~/dev
+
+# Download Qt 5.5.1 SDK and install into /opt/Qt5.5.1
+wget http://download.qt.io/official_releases/qt/5.5/5.5.1/qt-opensource-linux-x64-5.5.1.run
+cmod u+x qt-opensource-linux-x64-5.5.1.run
+sudo ./qt-opensource-linux-x64-5.5.1.run
 
 # Clone GC from GitHub
 git clone https://github.com/GoldenCheetah/GoldenCheetah.git
@@ -54,13 +56,29 @@ sed -i "s|^#UI_DIR|UI_DIR|" src/gcconfig.pri
 sed -i "s|^#LIBZ_LIBS|LIBZ_LIBS|" src/gcconfig.pri
 
 # Build make files recursively
-qmake -recursive
+~/dev/Qt551/55/gcc_64/bin/qmake -recursive
 
 # Build GC with four concurrent
 make -j4
 
 # Confirm it runs
 src/GoldenCheetah --version
+
+# Copy required files for making a deb
+# Need to change runpath's so install chrpath
+
+sudo apt-get install chrpath
+chrpath -r "\$ORIGIN:\$ORIGIN/lib" src/GoldenCheetah
+
+mkdir -p ~/dev/deploy/opt/GoldenCheetah/lib
+cp ~/dev/GoldenCheetah/src/GoldenCheetah ~/dev/deploy/opt/GoldenCheetah/
+cd ~/dev/deploy
+mkdir -p ~/dev/deploy/etc/udev/rules.d
+cp ~/dev/GoldenCheetah/src/Resources/linux/*.rules ~/dev/deploy/etc/udev/rules.d
+mkdir -p ~/dev/deploy/usr/share/{applications,pixmaps}
+cp ~/dev/GoldenCheetah/src/Resources/images/gc.png ~/dev/deploy/usr/share/pixmaps
+
+
 
 </body>
 </html>
