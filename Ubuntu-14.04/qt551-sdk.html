@@ -11,10 +11,6 @@ sudo apt-get upgrade
 # Build tools needed
 sudo apt-get install build-essential flex bison git
 
-# Qt5 libs needed
-sudo apt-get install qtbase5-dev qttools5-dev-tools
-sudo apt-get install libqt5svg5-dev qtmultimedia5-dev libqt5serialport5-dev libqt5webkit5-dev qtscript5-dev 
-
 # Needed to build kqoauth
 sudo apt-get install libssl-dev
 
@@ -26,6 +22,7 @@ mkdir ~/dev
 cd ~/dev
 
 # Download Qt 5.5.1 SDK and install into /opt/Qt5.5.1
+# This has to be done via a GUI as there is no CLI installer.
 wget http://download.qt.io/official_releases/qt/5.5/5.5.1/qt-opensource-linux-x64-5.5.1.run
 cmod u+x qt-opensource-linux-x64-5.5.1.run
 sudo ./qt-opensource-linux-x64-5.5.1.run
