@@ -1,0 +1,19 @@
+Use official QT SDK on Travis
+
+https://github.com/srazi/qupzilla
+
+Download individual official QT modules on Travis
+
+https://github.com/LRFLEW/OpenRCT2Launcher/
+
+QT bug with QML code example
+
+https://bugreports.qt.io/browse/QTBUG-50155?focusedCommentId=313113&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-313113
+
+QT 5.8 modules
+
+https://download.qt.io/online/qtsdkrepository/mac_x64/desktop/qt5_58/qt.58.clang_64/
+
+Create a DMG file
+
+https://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
